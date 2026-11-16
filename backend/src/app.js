@@ -1,26 +1,24 @@
 const path = require('path');
 const express = require('express');
+const { montarRutas } = require('./rutas');
 
-function crearApp() {
+function crearApp({ config, repos }) {
   const app = express();
-
-  app.disable('x-powered-by');
   app.use(express.json());
 
-  // Ruta de salud: sirve para comprobar que el servidor responde
   app.get('/api/salud', (req, res) => res.json({ estado: 'ok' }));
 
-  // Páginas estáticas del frontend (HTML, CSS y JavaScript)
-  app.use(express.static(path.join(__dirname, '..', '..', 'frontend')));
+  montarRutas(app, { config, repos });
 
-  // Rutas de la API que no existen
-  app.use('/api', (req, res) => res.status(404).json({ error: 'Recurso no encontrado.' }));
+  app.use(express.static(path.join(__dirname, '../../frontend')));
 
-  // Manejador de errores: mensaje claro y sin detalles técnicos para el usuario
-  // eslint-disable-next-line no-unused-vars
+  app.use('/api', (req, res) => res.status(404).json({ error: 'Ruta no encontrada' }));
+
+  // Manejo general de errores: nunca se muestra el detalle interno al cliente
   app.use((err, req, res, next) => {
-    console.error('[ERROR]', err);
-    res.status(500).json({ error: 'Ocurrió un error inesperado. Inténtalo de nuevo.' });
+    const estado = err.status || 500;
+    if (estado === 500) console.error(err);
+    res.status(estado).json({ error: estado === 500 ? 'Error interno del servidor' : 'Solicitud inválida' });
   });
 
   return app;
