@@ -3,41 +3,67 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registro | Plataforma ITSX</title>
+  <title>Registro | Plataforma Académica ITSX</title>
   <link rel="stylesheet" href="css/estilos.css">
 </head>
-<body>
-  <main class="tarjeta">
-    <h1>Crear cuenta de estudiante</h1>
+<body class="acceso">
+  <main class="tarjeta ancha">
+    <h1>Registro de Estudiante</h1>
+    <p class="subtitulo">Tronco Común - ITSX</p>
     <form id="formRegistro" novalidate>
-      <label for="nombre">Nombre(s)</label>
-      <input id="nombre" name="nombre" type="text" maxlength="80" required>
-
-      <label for="apellidos">Apellidos</label>
-      <input id="apellidos" name="apellidos" type="text" maxlength="100" required>
-
-      <label for="correo">Correo institucional</label>
-      <input id="correo" name="correo" type="email" required>
-
-      <label for="numeroControl">Número de control</label>
-      <input id="numeroControl" name="numeroControl" type="text" maxlength="20" required>
-
-      <label for="semestre">Semestre</label>
-      <input id="semestre" name="semestre" type="number" min="1" max="12" required>
-
-      <label for="contrasena">Contraseña</label>
-      <input id="contrasena" name="contrasena" type="password" autocomplete="new-password" required>
-      <span class="ayuda">Mínimo 8 caracteres, con mayúscula, minúscula y número.</span>
-
-      <label for="confirmar">Confirmar contraseña</label>
-      <input id="confirmar" type="password" autocomplete="new-password" required>
-
-      <button type="submit" id="btnRegistrar">Registrarme</button>
+      <div class="rejilla">
+        <div>
+          <label for="nombre">Nombre(s)</label>
+          <input id="nombre" name="nombre" type="text" maxlength="80" required>
+        </div>
+        <div>
+          <label for="apellidos">Apellidos</label>
+          <input id="apellidos" name="apellidos" type="text" maxlength="100" required>
+        </div>
+        <div>
+          <label for="numeroControl">Matrícula</label>
+          <input id="numeroControl" name="numeroControl" type="text" maxlength="20" required>
+        </div>
+        <div>
+          <label for="semestre">Semestre Actual</label>
+          <select id="semestre" name="semestre" required>
+            <option value="1">Primero</option>
+            <option value="2">Segundo</option>
+            <option value="3">Tercero</option>
+            <option value="4">Cuarto</option>
+            <option value="5">Quinto</option>
+            <option value="6">Sexto</option>
+            <option value="7">Séptimo</option>
+            <option value="8">Octavo</option>
+          </select>
+        </div>
+        <div class="completo">
+          <label for="correo">Correo Institucional</label>
+          <input id="correo" name="correo" type="email" placeholder="ejemplo@itsx.edu.mx" required>
+        </div>
+        <div>
+          <label for="contrasena">Contraseña</label>
+          <div class="campo-clave">
+            <input id="contrasena" name="contrasena" type="password" autocomplete="new-password" required>
+            <button type="button" class="ver" aria-label="Mostrar u ocultar contraseña">👁</button>
+          </div>
+        </div>
+        <div>
+          <label for="confirmar">Confirmar Contraseña</label>
+          <div class="campo-clave">
+            <input id="confirmar" type="password" autocomplete="new-password" required>
+            <button type="button" class="ver" aria-label="Mostrar u ocultar contraseña">👁</button>
+          </div>
+        </div>
+        <p class="ayuda completo">La contraseña debe tener mínimo 8 caracteres, con mayúscula, minúscula y número.</p>
+      </div>
+      <button type="submit" id="btnRegistrar">Registrarse</button>
     </form>
+    <p class="enlaces">¿Ya tienes cuenta? <a href="index.html">Inicia sesión</a></p>
     <div id="mensaje" class="mensaje" role="alert"></div>
-    <p class="enlaces">¿Ya tienes cuenta? <a href="index.html">Iniciar sesión</a></p>
   </main>
   <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
   <script src="js/registro.js"></script>
 </body>
 </html>
