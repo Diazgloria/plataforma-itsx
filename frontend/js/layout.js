@@ -2,6 +2,7 @@
 const MENU = {
   estudiante: [
     { id: 'inicio', texto: '🏠 Inicio', href: 'panel.html' },
+    { id: 'subir-material', texto: '📤 Subir Material', href: 'subir-material.html' },
     { id: 'mis-materias', texto: '📚 Mis Materias', href: 'mis-materias.html' },
     { id: 'semestres', texto: '📅 Semestres', href: 'semestres.html' },
   ],
