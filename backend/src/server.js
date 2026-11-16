@@ -3,6 +3,7 @@ const { crearPool } = require('./db');
 const { crearApp } = require('./app');
 const { crearRepoUsuarios } = require('./repositorios/usuarios');
 const { crearServicioCorreo } = require('./servicios/correo');
+const { crearRepoMaterias } = require('./repositorios/materias');
 
 async function iniciar() {
   const pool = crearPool(config.db);
@@ -16,7 +17,7 @@ async function iniciar() {
 
   const app = crearApp({
     config,
-    repos: { usuarios: crearRepoUsuarios(pool) },
+    repos: { usuarios: crearRepoUsuarios(pool), materias: crearRepoMaterias(pool) },
     correo: crearServicioCorreo(),
   });
 
