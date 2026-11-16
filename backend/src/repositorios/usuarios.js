@@ -43,6 +43,10 @@ function crearRepoUsuarios(pool) {
          );
          return resultado.affectedRows > 0;
        },
+              async contarPorRol() {
+         const [filas] = await pool.query('SELECT rol, COUNT(*) AS total FROM usuario GROUP BY rol');
+         return filas;
+       },
   };
 }
 

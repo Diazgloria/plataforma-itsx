@@ -15,5 +15,20 @@ function csrf(req, res, next) {
   }
   next();
 }
+// Exige una sesión iniciada
+function requiereSesion(req, res, next) {
+  if (!req.session.usuario) return res.status(401).json({ error: 'Debes iniciar sesión.' });
+  next();
+}
 
-module.exports = { csrf, obtenerTokenCsrf };
+// Exige una sesión iniciada con alguno de los roles indicados (RF-AUT-07)
+function requiereRol(...roles) {
+  return (req, res, next) => {
+    if (!req.session.usuario) return res.status(401).json({ error: 'Debes iniciar sesión.' });
+    if (!roles.includes(req.session.usuario.rol)) {
+      return res.status(403).json({ error: 'No tienes permiso para realizar esta acción.' });
+    }
+    next();
+  };
+}
+module.exports = { csrf, obtenerTokenCsrf, requiereSesion, requiereRol };
