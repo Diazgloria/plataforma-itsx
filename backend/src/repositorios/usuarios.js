@@ -54,6 +54,23 @@ function crearRepoUsuarios(pool) {
          );
          return resultado.affectedRows > 0;
        },
+              async obtenerPerfil(idUsuario) {
+         const [filas] = await pool.query(
+           `SELECT id_usuario, nombre, apellidos, correo_institucional, rol, estado_cuenta,
+                   numero_control, semestre, departamento, fecha_registro
+              FROM usuario WHERE id_usuario = ?`,
+           [idUsuario]
+         );
+         return filas[0] || null;
+       },
+
+       // El semestre solo se modifica si llega un valor (los docentes y administradores no tienen)
+       async actualizarDatosPersonales(idUsuario, { nombre, apellidos, semestre }) {
+         await pool.query(
+           'UPDATE usuario SET nombre = ?, apellidos = ?, semestre = COALESCE(?, semestre) WHERE id_usuario = ?',
+           [nombre, apellidos, semestre, idUsuario]
+         );
+       },
   };
 }
 
