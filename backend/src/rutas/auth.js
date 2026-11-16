@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const { validarRegistro } = require('../servicios/validaciones');
-const { crearToken } = require('../servicios/tokens');
+const { crearToken, verificarToken } = require('../servicios/tokens');
 
 const COSTO_BCRYPT = 10;
 
@@ -62,5 +62,27 @@ module.exports = function ({ config, repos, correo }) {
     }
   });
 
+    // RF-AUT-03: activación de la cuenta con el enlace enviado por correo
+  router.post('/verificar', async (req, res) => {
+    const resultado = verificarToken((req.body || {}).token, config.secreto, 'verificacion');
+    if (!resultado.valido) {
+      const texto = resultado.motivo === 'expirado'
+        ? 'El enlace de verificación expiró (vigencia de 24 horas).'
+        : 'El enlace de verificación no es válido.';
+      return res.status(400).json({ error: texto });
+    }
+
+    const usuario = await repos.usuarios.buscarPorId(resultado.idUsuario);
+    if (!usuario) return res.status(400).json({ error: 'El enlace de verificación no es válido.' });
+    if (usuario.estado_cuenta === 'suspendida') {
+      return res.status(403).json({ error: 'La cuenta está suspendida. Contacta al administrador.' });
+    }
+    if (usuario.estado_cuenta === 'activa') {
+      return res.json({ mensaje: 'Tu cuenta ya estaba activa. Ya puedes iniciar sesión.' });
+    }
+
+    await repos.usuarios.activarCuenta(usuario.id_usuario);
+    return res.json({ mensaje: 'Cuenta activada correctamente. Ya puedes iniciar sesión.' });
+  });
   return router;
 };
