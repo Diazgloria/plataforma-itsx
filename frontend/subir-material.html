@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subir Material | Plataforma ITSX</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <div id="app"></div>
+
+  <template id="plantilla">
+    <h1>Subir Material Académico</h1>
+    <form id="formMaterial" class="formulario" novalidate>
+      <label for="titulo">Título del Documento</label>
+      <input id="titulo" name="titulo" type="text" maxlength="150" placeholder="Ej: Apuntes Unidad 1 - Cálculo" required>
+
+      <label for="idMateria">Materia de Tronco Común</label>
+      <select id="idMateria" name="idMateria" required>
+        <option value="">-- Selecciona una Materia --</option>
+      </select>
+
+      <label for="descripcion">Descripción Breve</label>
+      <textarea id="descripcion" name="descripcion" rows="3" maxlength="500" placeholder="Indica temas cubiertos o detalles relevantes"></textarea>
+
+      <label for="palabrasClave">Palabras clave</label>
+      <input id="palabrasClave" name="palabrasClave" type="text" maxlength="200" placeholder="Ej: límites, continuidad">
+
+      <label for="archivo">Seleccionar Archivo (PDF, DOCX, PPTX, XLSX, JPG o PNG; máximo 20 MB)</label>
+      <input id="archivo" name="archivo" type="file" accept=".pdf,.docx,.pptx,.xlsx,.jpg,.jpeg,.png" required>
+
+      <label class="casilla">
+        <input type="checkbox" name="declaracion" value="true">
+        Declaro que el material es de mi autoría o que tengo derecho a compartirlo, y que respeta los derechos de autor.
+      </label>
+
+      <button type="submit" id="btnSubir">Subir Archivo</button>
+    </form>
+    <div id="mensaje" class="mensaje" role="alert"></div>
+  </template>
+
+  <script src="js/api.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/subir-material.js"></script>
+</body>
+</html>

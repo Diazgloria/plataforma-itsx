@@ -16,7 +16,10 @@ async function api(ruta, opciones = {}) {
   const metodo = opciones.metodo || 'GET';
   const peticion = { method: metodo, headers: {}, credentials: 'same-origin' };
   if (metodo !== 'GET') peticion.headers['x-csrf-token'] = await obtenerCsrf();
-  if (opciones.cuerpo) {
+  if (opciones.formulario) {
+    // FormData con archivo: el navegador define el Content-Type por su cuenta
+    peticion.body = opciones.formulario;
+  } else if (opciones.cuerpo) {
     peticion.headers['Content-Type'] = 'application/json';
     peticion.body = JSON.stringify(opciones.cuerpo);
   }

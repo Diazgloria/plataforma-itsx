@@ -15,6 +15,13 @@ function crearRepoMaterias(pool) {
       );
       return filas;
     },
+    async buscarActivaPorId(id) {
+      const [filas] = await pool.query(
+        'SELECT id_materia, clave, nombre, semestre FROM materia WHERE id_materia = ? AND activa = TRUE',
+        [id]
+      );
+      return filas[0] || null;
+    },
   };
 }
 
