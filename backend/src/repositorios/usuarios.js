@@ -47,6 +47,13 @@ function crearRepoUsuarios(pool) {
          const [filas] = await pool.query('SELECT rol, COUNT(*) AS total FROM usuario GROUP BY rol');
          return filas;
        },
+        async actualizarContrasena(idUsuario, hash) {
+         const [resultado] = await pool.query(
+           'UPDATE usuario SET contrasena_hash = ? WHERE id_usuario = ?',
+           [hash, idUsuario]
+         );
+         return resultado.affectedRows > 0;
+       },
   };
 }
 

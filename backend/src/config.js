@@ -17,6 +17,8 @@ const config = {
   secreto: process.env.SECRETO_APP || 'secreto-solo-para-desarrollo',
   // Vigencia del enlace de verificación de cuenta: 24 horas (RF-AUT-03)
   vigenciaVerificacionMs: 24 * 60 * 60 * 1000,
+    // Vigencia del enlace de recuperación de contraseña: 1 hora
+  vigenciaRecuperacionMs: 60 * 60 * 1000,
     // Sesión: expira tras 30 minutos sin actividad (RNF-SEG-05)
   sesion: { inactividadMs: 30 * 60 * 1000 },
   // Bloqueo por intentos fallidos de inicio de sesión (RF-AUT-05)
