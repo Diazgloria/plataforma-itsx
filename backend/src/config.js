@@ -13,6 +13,10 @@ const config = {
   },
   // Dominio de correo institucional permitido para el registro de estudiantes (RF-AUT-02)
   dominioCorreo: (process.env.DOMINIO_CORREO || 'itsx.edu.mx').toLowerCase(),
+    // Clave para firmar los tokens (verificación, recuperación). En producción debe ser larga y secreta.
+  secreto: process.env.SECRETO_APP || 'secreto-solo-para-desarrollo',
+  // Vigencia del enlace de verificación de cuenta: 24 horas (RF-AUT-03)
+  vigenciaVerificacionMs: 24 * 60 * 60 * 1000,
 };
 
 module.exports = config;
