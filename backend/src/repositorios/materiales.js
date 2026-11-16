@@ -43,6 +43,40 @@ function crearRepoMateriales(pool) {
         conexion.release();
       }
     },
+        // Catálogo: solo materiales validados, con filtro opcional por materia y por texto
+    async buscarValidados({ texto = '', idMateria = null }) {
+      const patron = texto ? `%${texto.replace(/[\\%_]/g, '\\$&')}%` : null;
+      const [filas] = await pool.query(
+        `SELECT m.id_material, m.titulo, m.descripcion, m.fecha_carga,
+                ma.nombre AS materia, ma.clave AS materia_clave,
+                CONCAT(u.nombre, ' ', u.apellidos) AS autor,
+                v.formato, v.tamano_bytes,
+                c.codigo AS codigo_validacion
+           FROM material m
+           JOIN materia ma ON ma.id_materia = m.id_materia
+           JOIN usuario u ON u.id_usuario = m.id_autor
+           JOIN version_material v ON v.id_material = m.id_material AND v.vigente = TRUE
+           LEFT JOIN codigo_validacion c ON c.id_material = m.id_material
+          WHERE m.estado = 'validado'
+            AND (? IS NULL OR m.id_materia = ?)
+            AND (? IS NULL OR m.titulo LIKE ? OR m.palabras_clave LIKE ? OR m.descripcion LIKE ?)
+          ORDER BY m.fecha_carga DESC, m.id_material DESC`,
+        [idMateria, idMateria, patron, patron, patron, patron]
+      );
+      return filas;
+    },
+
+    // Datos para entregar el archivo de la versión vigente
+    async obtenerArchivoVigente(idMaterial) {
+      const [filas] = await pool.query(
+        `SELECT m.id_material, m.id_autor, m.estado, v.numero, v.formato, v.nombre_archivo
+           FROM material m
+           JOIN version_material v ON v.id_material = m.id_material AND v.vigente = TRUE
+          WHERE m.id_material = ?`,
+        [idMaterial]
+      );
+      return filas[0] || null;
+    },
   };
 }
 

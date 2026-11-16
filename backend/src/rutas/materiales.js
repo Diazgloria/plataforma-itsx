@@ -1,6 +1,6 @@
 const express = require('express');
 const multer = require('multer');
-const { requiereRol } = require('../middleware/seguridad');
+const { requiereRol, requiereSesion } = require('../middleware/seguridad');
 const { formatoDeNombre, coincideFirma, huellaSha256, nombreOriginal, crearAlmacen } = require('../servicios/archivos');
 
 module.exports = function ({ config, repos }) {
@@ -68,6 +68,39 @@ module.exports = function ({ config, repos }) {
     res.status(201).json({
       mensaje: 'Material enviado. Quedó pendiente de validación por un docente.',
       material: { id: idMaterial, titulo, estado: 'pendiente_validacion', formato },
+    });
+  });
+
+    // Catálogo de materiales validados: ?q=texto&materia=id
+  router.get('/', requiereSesion, async (req, res) => {
+    const texto = String(req.query.q || '').trim().slice(0, 100);
+    let idMateria = null;
+    if (req.query.materia) {
+      idMateria = Number(req.query.materia);
+      if (!Number.isInteger(idMateria) || idMateria < 1) {
+        return res.status(400).json({ error: 'Materia inválida.' });
+      }
+    }
+    res.json({ materiales: await repos.materiales.buscarValidados({ texto, idMateria }) });
+  });
+
+  // Descarga del archivo vigente: validado para cualquiera con sesión; los demás estados, solo el autor, docentes y administradores
+  router.get('/:id/archivo', requiereSesion, async (req, res) => {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: 'Material inválido.' });
+
+    const material = await repos.materiales.obtenerArchivoVigente(id);
+    const usuario = req.session.usuario;
+    const puede = material && (
+      material.estado === 'validado' ||
+      material.id_autor === usuario.id ||
+      usuario.rol === 'docente' || usuario.rol === 'administrador'
+    );
+    if (!puede) return res.status(404).json({ error: 'El material no existe o no está disponible.' });
+
+    const ruta = almacen.rutaDe(material.id_material, material.numero, material.formato);
+    res.download(ruta, material.nombre_archivo, (err) => {
+      if (err && !res.headersSent) res.status(404).json({ error: 'El archivo no está disponible en el servidor.' });
     });
   });
 
