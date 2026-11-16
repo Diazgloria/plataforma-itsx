@@ -3,28 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Iniciar sesión | Plataforma ITSX</title>
+  <title>Iniciar sesión | Plataforma Académica ITSX</title>
   <link rel="stylesheet" href="css/estilos.css">
 </head>
-<body>
+<body class="acceso">
   <main class="tarjeta">
-    <h1>Plataforma ITSX</h1>
-    <p>Inicia sesión con tu cuenta institucional.</p>
+    <h1>Plataforma Académica ITSX</h1>
+    <p class="subtitulo">Tronco Común - Ingeniería en Sistemas</p>
     <form id="formLogin" novalidate>
-      <label for="correo">Correo institucional</label>
-      <input id="correo" name="correo" type="email" autocomplete="username" required>
+      <label for="correo">Correo Institucional</label>
+      <input id="correo" name="correo" type="email" placeholder="usuario@itsx.edu.mx" autocomplete="username" required>
 
       <label for="contrasena">Contraseña</label>
-      <input id="contrasena" name="contrasena" type="password" autocomplete="current-password" required>
+      <div class="campo-clave">
+        <input id="contrasena" name="contrasena" type="password" autocomplete="current-password" required>
+        <button type="button" class="ver" aria-label="Mostrar u ocultar contraseña">👁</button>
+      </div>
 
-      <button type="submit" id="btnEntrar">Entrar</button>
+      <button type="submit" id="btnEntrar">Iniciar Sesión</button>
     </form>
+    <p class="enlaces">¿No tienes cuenta? <a href="registro.html">Regístrate aquí</a></p>
+    <p class="enlaces"><a href="recuperar.html">¿Olvidaste tu contraseña?</a></p>
     <div id="mensaje" class="mensaje" role="alert"></div>
-    <p class="enlaces">
-      <a href="registro.html">Crear cuenta</a>
-    </p>
   </main>
   <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
   <script src="js/login.js"></script>
 </body>
 </html>
