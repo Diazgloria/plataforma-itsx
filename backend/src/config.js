@@ -11,6 +11,8 @@ const config = {
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME || 'BD_plataforma_itsx',
   },
+  // Dominio de correo institucional permitido para el registro de estudiantes (RF-AUT-02)
+  dominioCorreo: (process.env.DOMINIO_CORREO || 'itsx.edu.mx').toLowerCase(),
 };
 
 module.exports = config;
