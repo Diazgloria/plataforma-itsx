@@ -2,13 +2,13 @@ const path = require('path');
 const express = require('express');
 const { montarRutas } = require('./rutas');
 
-function crearApp({ config, repos }) {
+function crearApp({ config, repos, correo }) {
   const app = express();
   app.use(express.json());
 
   app.get('/api/salud', (req, res) => res.json({ estado: 'ok' }));
 
-  montarRutas(app, { config, repos });
+  montarRutas(app, { config, repos, correo });
 
   app.use(express.static(path.join(__dirname, '../../frontend')));
 

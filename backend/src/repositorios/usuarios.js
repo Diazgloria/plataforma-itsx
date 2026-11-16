@@ -25,6 +25,24 @@ function crearRepoUsuarios(pool) {
       );
       return resultado.insertId;
     },
+            async buscarPorId(idUsuario) {
+         const [filas] = await pool.query(
+           `SELECT id_usuario, nombre, apellidos, correo_institucional, contrasena_hash, rol, estado_cuenta
+              FROM usuario WHERE id_usuario = ?`,
+           [idUsuario]
+         );
+         return filas[0] || null;
+       },
+
+       // Activa la cuenta solo si seguía pendiente de verificación
+       async activarCuenta(idUsuario) {
+         const [resultado] = await pool.query(
+           `UPDATE usuario SET estado_cuenta = 'activa'
+             WHERE id_usuario = ? AND estado_cuenta = 'pendiente_verificacion'`,
+           [idUsuario]
+         );
+         return resultado.affectedRows > 0;
+       },
   };
 }
 

@@ -1,10 +1,11 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const { validarRegistro } = require('../servicios/validaciones');
+const { crearToken, verificarToken } = require('../servicios/tokens');
 
 const COSTO_BCRYPT = 10;
 
-module.exports = function ({ config, repos }) {
+module.exports = function ({ config, repos, correo }) {
   const router = express.Router();
 
   // RF-AUT-01: registro de estudiantes con correo institucional
@@ -30,10 +31,28 @@ module.exports = function ({ config, repos }) {
         numeroControl: datos.numeroControl,
         semestre: datos.semestre,
       });
-      return res.status(201).json({
-        mensaje: 'Cuenta creada. Falta verificar el correo para activarla.',
+            // RF-AUT-03: enlace de verificación con vigencia de 24 horas
+      const token = crearToken({
+        proposito: 'verificacion',
         idUsuario,
+        vigenciaMs: config.vigenciaVerificacionMs,
+        secreto: config.secreto,
       });
+      const enlace = `http://localhost:${config.puerto}/verificar.html?token=${encodeURIComponent(token)}`;
+      await correo.enviar({
+        para: datos.correo,
+        asunto: 'Verifica tu cuenta en la Plataforma ITSX',
+        texto: `Hola ${datos.nombre}, activa tu cuenta (vigencia de 24 horas) en: ${enlace}`,
+      });
+
+      const respuesta = {
+        mensaje: 'Cuenta creada. Revisa tu correo institucional para activarla.',
+        idUsuario,
+      };
+      // Solo en desarrollo se devuelve el enlace, porque el correo es simulado
+      if (config.entorno !== 'production') respuesta.enlaceVerificacion = enlace;
+      return res.status(201).json(respuesta);
+
     } catch (err) {
       // Dos registros simultáneos con los mismos datos
       if (err.code === 'ER_DUP_ENTRY') {
@@ -43,5 +62,27 @@ module.exports = function ({ config, repos }) {
     }
   });
 
+    // RF-AUT-03: activación de la cuenta con el enlace enviado por correo
+  router.post('/verificar', async (req, res) => {
+    const resultado = verificarToken((req.body || {}).token, config.secreto, 'verificacion');
+    if (!resultado.valido) {
+      const texto = resultado.motivo === 'expirado'
+        ? 'El enlace de verificación expiró (vigencia de 24 horas).'
+        : 'El enlace de verificación no es válido.';
+      return res.status(400).json({ error: texto });
+    }
+
+    const usuario = await repos.usuarios.buscarPorId(resultado.idUsuario);
+    if (!usuario) return res.status(400).json({ error: 'El enlace de verificación no es válido.' });
+    if (usuario.estado_cuenta === 'suspendida') {
+      return res.status(403).json({ error: 'La cuenta está suspendida. Contacta al administrador.' });
+    }
+    if (usuario.estado_cuenta === 'activa') {
+      return res.json({ mensaje: 'Tu cuenta ya estaba activa. Ya puedes iniciar sesión.' });
+    }
+
+    await repos.usuarios.activarCuenta(usuario.id_usuario);
+    return res.json({ mensaje: 'Cuenta activada correctamente. Ya puedes iniciar sesión.' });
+  });
   return router;
 };
