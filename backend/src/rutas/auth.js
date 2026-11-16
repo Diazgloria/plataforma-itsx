@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const { validarRegistro } = require('../servicios/validaciones');
-const { crearToken, verificarToken } = require('../servicios/tokens');
+const { validarRegistro, validarContrasena } = require('../servicios/validaciones');
+const { crearToken, verificarToken, huellaContrasena } = require('../servicios/tokens');
 const { obtenerTokenCsrf } = require('../middleware/seguridad');
 
 const COSTO_BCRYPT = 10;
@@ -10,6 +10,21 @@ const HASH_FALSO = bcrypt.hashSync('contrasena-de-relleno', COSTO_BCRYPT);
 
 // Intentos fallidos por correo (en memoria): { cuenta, hasta }
 const intentos = new Map();
+
+// Cierra todas las sesiones activas de un usuario (si el almacén de sesiones lo permite)
+function cerrarSesionesDe(req, idUsuario) {
+  const almacen = req.sessionStore;
+  if (!almacen || typeof almacen.all !== 'function') return Promise.resolve();
+  return new Promise((resolver) => {
+    almacen.all((err, sesiones) => {
+      if (err || !sesiones) return resolver();
+      Object.entries(sesiones).forEach(([sid, datos]) => {
+        if (datos.usuario && datos.usuario.id === idUsuario) almacen.destroy(sid, () => {});
+      });
+      resolver();
+    });
+  });
+}
 
 module.exports = function ({ config, repos, correo }) {
   const router = express.Router();
@@ -163,6 +178,65 @@ module.exports = function ({ config, repos, correo }) {
   router.get('/yo', (req, res) => {
     if (!req.session.usuario) return res.status(401).json({ error: 'No has iniciado sesión.' });
     return res.json({ usuario: req.session.usuario });
+  });
+
+    // Solicitud de recuperación: la respuesta es la misma exista o no el correo,
+  // para no revelar qué cuentas están registradas
+  router.post('/recuperar', async (req, res) => {
+    const direccion = String((req.body || {}).correo || '').trim().toLowerCase();
+    if (!direccion) return res.status(400).json({ error: 'Escribe tu correo institucional.' });
+
+    const respuesta = { mensaje: 'Si el correo está registrado, recibirás un enlace con vigencia de 1 hora.' };
+    const usuario = await repos.usuarios.buscarPorCorreo(direccion);
+    if (usuario && usuario.estado_cuenta === 'activa') {
+      const token = crearToken({
+        proposito: 'recuperacion',
+        idUsuario: usuario.id_usuario,
+        vigenciaMs: config.vigenciaRecuperacionMs,
+        secreto: config.secreto,
+        extra: huellaContrasena(usuario.contrasena_hash),
+      });
+      const enlace = `http://localhost:${config.puerto}/restablecer.html?token=${encodeURIComponent(token)}`;
+      await correo.enviar({
+        para: usuario.correo_institucional,
+        asunto: 'Recupera tu contraseña en la Plataforma ITSX',
+        texto: `Para restablecer tu contraseña (vigencia de 1 hora) entra a: ${enlace}`,
+      });
+      if (config.entorno !== 'production') respuesta.enlaceRecuperacion = enlace;
+    }
+    return res.json(respuesta);
+  });
+
+  // Establece la nueva contraseña con el enlace recibido
+  router.post('/restablecer', async (req, res) => {
+    const cuerpo = req.body || {};
+    const invalido = () => res.status(400).json({
+      error: 'El enlace no es válido, ya fue utilizado o expiró (vigencia de 1 hora).',
+    });
+
+    const resultado = verificarToken(cuerpo.token, config.secreto, 'recuperacion');
+    if (!resultado.valido) return invalido();
+
+    const usuario = await repos.usuarios.buscarPorId(resultado.idUsuario);
+    // El enlace sirve una sola vez: deja de valer en cuanto cambia la contraseña
+    if (!usuario || usuario.estado_cuenta !== 'activa' ||
+        resultado.extra !== huellaContrasena(usuario.contrasena_hash)) {
+      return invalido();
+    }
+
+    const faltantes = validarContrasena(cuerpo.contrasena);
+    if (faltantes.length > 0) {
+      return res.status(400).json({
+        error: 'Datos inválidos',
+        detalles: [`La contraseña debe tener: ${faltantes.join(', ')}.`],
+      });
+    }
+
+    const hash = await bcrypt.hash(cuerpo.contrasena, COSTO_BCRYPT);
+    await repos.usuarios.actualizarContrasena(usuario.id_usuario, hash);
+    intentos.delete(usuario.correo_institucional.toLowerCase()); // se quita un bloqueo previo
+    await cerrarSesionesDe(req, usuario.id_usuario);              // se cierran las sesiones abiertas
+    return res.json({ mensaje: 'Contraseña actualizada. Ya puedes iniciar sesión con tu nueva contraseña.' });
   });
   return router;
 };
