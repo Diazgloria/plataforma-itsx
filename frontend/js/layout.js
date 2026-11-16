@@ -6,16 +6,19 @@ const MENU = {
     { id: 'subir-material', texto: '📤 Subir Material', href: 'subir-material.html' },
     { id: 'mis-materias', texto: '📚 Mis Materias', href: 'mis-materias.html' },
     { id: 'semestres', texto: '📅 Semestres', href: 'semestres.html' },
+    { id: 'perfil', texto: '👤 Mi perfil', href: 'perfil.html' },
   ],
   docente: [
     { id: 'inicio', texto: '🏠 Inicio', href: 'panel.html' },
     { id: 'buscar', texto: '🔍 Buscar / Catálogo', href: 'buscar.html' },
     { id: 'semestres', texto: '📅 Semestres', href: 'semestres.html' },
+    { id: 'perfil', texto: '👤 Mi perfil', href: 'perfil.html' },
   ],
   administrador: [
     { id: 'inicio', texto: '🏠 Inicio', href: 'panel.html' },
     { id: 'buscar', texto: '🔍 Buscar / Catálogo', href: 'buscar.html' },
     { id: 'semestres', texto: '📅 Semestres', href: 'semestres.html' },
+    { id: 'perfil', texto: '👤 Mi perfil', href: 'perfil.html' },
   ],
 };
 

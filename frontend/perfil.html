@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi perfil | Plataforma ITSX</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <div id="app"></div>
+
+  <template id="plantilla">
+    <h1>Mi perfil</h1>
+    <div class="dos-columnas">
+      <section class="panel">
+        <h2>Datos personales</h2>
+        <form id="formDatos" novalidate>
+          <div class="rejilla">
+            <div>
+              <label for="nombre">Nombre(s)</label>
+              <input id="nombre" type="text" maxlength="80" required>
+            </div>
+            <div>
+              <label for="apellidos">Apellidos</label>
+              <input id="apellidos" type="text" maxlength="100" required>
+            </div>
+            <div id="bloqueSemestre" class="completo" hidden>
+              <label for="semestre">Semestre actual</label>
+              <select id="semestre">
+                <option value="1">Primero</option><option value="2">Segundo</option>
+                <option value="3">Tercero</option><option value="4">Cuarto</option>
+                <option value="5">Quinto</option><option value="6">Sexto</option>
+                <option value="7">Séptimo</option><option value="8">Octavo</option>
+              </select>
+            </div>
+          </div>
+          <p class="subtitulo-lectura">Datos de solo lectura</p>
+          <div id="datosLectura"></div>
+          <button type="submit" id="btnDatos">Guardar cambios</button>
+        </form>
+        <div id="mensajeDatos" class="mensaje" role="alert"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Cambiar contraseña</h2>
+        <form id="formClave" novalidate>
+          <label for="actual">Contraseña actual</label>
+          <div class="campo-clave">
+            <input id="actual" type="password" autocomplete="current-password" required>
+            <button type="button" class="ver" aria-label="Mostrar u ocultar contraseña">👁</button>
+          </div>
+          <label for="nueva">Nueva contraseña</label>
+          <div class="campo-clave">
+            <input id="nueva" type="password" autocomplete="new-password" required>
+            <button type="button" class="ver" aria-label="Mostrar u ocultar contraseña">👁</button>
+          </div>
+          <label for="confirmar">Confirmar nueva contraseña</label>
+          <div class="campo-clave">
+            <input id="confirmar" type="password" autocomplete="new-password" required>
+            <button type="button" class="ver" aria-label="Mostrar u ocultar contraseña">👁</button>
+          </div>
+          <p class="ayuda">Mínimo 8 caracteres, con mayúscula, minúscula y número.</p>
+          <button type="submit" id="btnClave" class="secundario">Cambiar contraseña</button>
+        </form>
+        <div id="mensajeClave" class="mensaje" role="alert"></div>
+      </section>
+    </div>
+  </template>
+
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/perfil.js"></script>
+</body>
+</html>
