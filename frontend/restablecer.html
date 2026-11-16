@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Establecer contraseña | Plataforma ITSX</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body class="acceso">
+  <main class="tarjeta">
+    <h1>Establecer contraseña</h1>
+    <p class="subtitulo">Escribe tu nueva contraseña.</p>
+    <form id="formRestablecer" novalidate>
+      <label for="contrasena">Nueva contraseña</label>
+      <div class="campo-clave">
+        <input id="contrasena" name="contrasena" type="password" autocomplete="new-password" required>
+        <button type="button" class="ver" aria-label="Mostrar u ocultar contraseña">👁</button>
+      </div>
+
+      <label for="confirmar">Confirmar contraseña</label>
+      <div class="campo-clave">
+        <input id="confirmar" type="password" autocomplete="new-password" required>
+        <button type="button" class="ver" aria-label="Mostrar u ocultar contraseña">👁</button>
+      </div>
+      <p class="ayuda">Mínimo 8 caracteres, con mayúscula, minúscula y número.</p>
+
+      <button type="submit" id="btnGuardar">Guardar contraseña</button>
+    </form>
+    <p class="enlaces"><a href="index.html">Ir a iniciar sesión</a></p>
+    <div id="mensaje" class="mensaje" role="alert"></div>
+  </main>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/restablecer.js"></script>
+</body>
+</html>
