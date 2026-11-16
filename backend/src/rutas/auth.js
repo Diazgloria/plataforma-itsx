@@ -2,8 +2,14 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const { validarRegistro } = require('../servicios/validaciones');
 const { crearToken, verificarToken } = require('../servicios/tokens');
+const { obtenerTokenCsrf } = require('../middleware/seguridad');
 
 const COSTO_BCRYPT = 10;
+// Hash de relleno: se compara aunque el correo no exista, para que la respuesta tarde igual
+const HASH_FALSO = bcrypt.hashSync('contrasena-de-relleno', COSTO_BCRYPT);
+
+// Intentos fallidos por correo (en memoria): { cuenta, hasta }
+const intentos = new Map();
 
 module.exports = function ({ config, repos, correo }) {
   const router = express.Router();
@@ -83,6 +89,79 @@ module.exports = function ({ config, repos, correo }) {
 
     await repos.usuarios.activarCuenta(usuario.id_usuario);
     return res.json({ mensaje: 'Cuenta activada correctamente. Ya puedes iniciar sesión.' });
+  });
+
+    // El frontend pide este token antes de enviar formularios
+  router.get('/csrf', (req, res) => {
+    res.json({ token: obtenerTokenCsrf(req) });
+  });
+
+    // RF-AUT-04 y RF-AUT-05: inicio de sesión con bloqueo tras intentos fallidos
+  router.post('/login', async (req, res) => {
+    const cuerpo = req.body || {};
+    const correo = String(cuerpo.correo || '').trim().toLowerCase();
+    const contrasena = String(cuerpo.contrasena || '');
+    if (!correo || !contrasena) {
+      return res.status(400).json({ error: 'Ingresa tu correo y tu contraseña.' });
+    }
+
+    const registro = intentos.get(correo);
+    if (registro && registro.hasta) {
+      if (registro.hasta > Date.now()) {
+        const minutos = Math.ceil((registro.hasta - Date.now()) / 60000);
+        return res.status(429).json({
+          error: `Cuenta bloqueada por intentos fallidos. Intenta de nuevo en ${minutos} minuto(s).`,
+        });
+      }
+      intentos.delete(correo); // el bloqueo ya venció
+    }
+
+    const usuario = await repos.usuarios.buscarPorCorreo(correo);
+    const coincide = await bcrypt.compare(contrasena, usuario ? usuario.contrasena_hash : HASH_FALSO);
+
+    if (!usuario || !coincide) {
+      const actual = intentos.get(correo) || { cuenta: 0, hasta: 0 };
+      actual.cuenta += 1;
+      if (actual.cuenta >= config.bloqueo.maxIntentos) {
+        actual.hasta = Date.now() + config.bloqueo.duracionMs;
+        actual.cuenta = 0;
+      }
+      intentos.set(correo, actual);
+      return res.status(401).json({ error: 'Correo o contraseña incorrectos.' });
+    }
+
+    if (usuario.estado_cuenta === 'pendiente_verificacion') {
+      return res.status(403).json({ error: 'Debes verificar tu correo antes de iniciar sesión.' });
+    }
+    if (usuario.estado_cuenta === 'suspendida') {
+      return res.status(403).json({ error: 'La cuenta está suspendida. Contacta al administrador.' });
+    }
+
+    intentos.delete(correo);
+    // Sesión nueva al autenticarse (evita fijación de sesión)
+    await new Promise((ok, fallo) => req.session.regenerate((e) => (e ? fallo(e) : ok())));
+    req.session.usuario = {
+      id: usuario.id_usuario,
+      nombre: usuario.nombre,
+      apellidos: usuario.apellidos,
+      correo: usuario.correo_institucional,
+      rol: usuario.rol,
+    };
+    return res.json({ usuario: req.session.usuario, csrf: obtenerTokenCsrf(req) });
+  });
+
+  // Cierre de sesión (RF-AUT-06)
+  router.post('/logout', (req, res) => {
+    req.session.destroy(() => {
+      res.clearCookie('sid');
+      res.json({ mensaje: 'Sesión cerrada.' });
+    });
+  });
+
+  // Datos del usuario con sesión activa
+  router.get('/yo', (req, res) => {
+    if (!req.session.usuario) return res.status(401).json({ error: 'No has iniciado sesión.' });
+    return res.json({ usuario: req.session.usuario });
   });
   return router;
 };
