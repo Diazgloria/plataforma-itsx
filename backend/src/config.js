@@ -21,6 +21,10 @@ const config = {
   sesion: { inactividadMs: 30 * 60 * 1000 },
   // Bloqueo por intentos fallidos de inicio de sesión (RF-AUT-05)
   bloqueo: { maxIntentos: 5, duracionMs: 15 * 60 * 1000 },
+    // Límite de tamaño por archivo: 20 MB
+  tamanoMaximoBytes: 20 * 1024 * 1024,
+  // Carpeta donde se guardan los archivos subidos (fuera de la carpeta pública)
+  carpetaArchivos: process.env.STORAGE_DIR || './storage',
 };
 
 module.exports = config;
