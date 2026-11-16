@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recuperar contraseña | Plataforma ITSX</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body class="acceso">
+  <main class="tarjeta">
+    <h1>Recuperar contraseña</h1>
+    <p class="subtitulo">Escribe tu correo institucional y te enviaremos un enlace para restablecer tu contraseña.</p>
+    <form id="formRecuperar" novalidate>
+      <label for="correo">Correo Institucional</label>
+      <input id="correo" name="correo" type="email" placeholder="usuario@itsx.edu.mx" required>
+      <button type="submit" id="btnEnviar">Enviar enlace</button>
+    </form>
+    <p class="enlaces"><a href="index.html">Volver al inicio de sesión</a></p>
+    <div id="mensaje" class="mensaje" role="alert"></div>
+  </main>
+  <script src="js/api.js"></script>
+  <script src="js/recuperar.js"></script>
+</body>
+</html>
