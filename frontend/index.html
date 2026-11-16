@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar sesión | Plataforma ITSX</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <main class="tarjeta">
+    <h1>Plataforma ITSX</h1>
+    <p>Inicia sesión con tu cuenta institucional.</p>
+    <form id="formLogin" novalidate>
+      <label for="correo">Correo institucional</label>
+      <input id="correo" name="correo" type="email" autocomplete="username" required>
+
+      <label for="contrasena">Contraseña</label>
+      <input id="contrasena" name="contrasena" type="password" autocomplete="current-password" required>
+
+      <button type="submit" id="btnEntrar">Entrar</button>
+    </form>
+    <div id="mensaje" class="mensaje" role="alert"></div>
+    <p class="enlaces">
+      <a href="registro.html">Crear cuenta</a>
+    </p>
+  </main>
+  <script src="js/api.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>

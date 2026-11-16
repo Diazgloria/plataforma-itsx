@@ -12,3 +12,6 @@ button:disabled { opacity: .6; cursor: wait; }
 .mensaje ul { margin: 6px 0 0; padding-left: 18px; }
 .ayuda { font-size: .8rem; color: #5b6574; }
 .enlaces { margin-top: 16px; font-size: .9rem; text-align: center; }
+button.secundario { background: #6b7280; }
+.datos-usuario { margin: 12px 0; line-height: 1.7; }
+.etiqueta-rol { display: inline-block; padding: 2px 10px; border-radius: 12px; background: #dbe7fb; color: #1b3a6b; font-size: .85rem; }
