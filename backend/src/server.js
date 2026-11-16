@@ -2,6 +2,7 @@ const config = require('./config');
 const { crearPool } = require('./db');
 const { crearApp } = require('./app');
 const { crearRepoUsuarios } = require('./repositorios/usuarios');
+const { crearServicioCorreo } = require('./servicios/correo');
 
 async function iniciar() {
   const pool = crearPool(config.db);
@@ -13,7 +14,12 @@ async function iniciar() {
     process.exit(1);
   }
 
-  const app = crearApp({ config, repos: { usuarios: crearRepoUsuarios(pool) } });
+  const app = crearApp({
+    config,
+    repos: { usuarios: crearRepoUsuarios(pool) },
+    correo: crearServicioCorreo(),
+  });
+
   app.listen(config.puerto, () => {
     console.log(`Servidor escuchando en http://localhost:${config.puerto}`);
   });
