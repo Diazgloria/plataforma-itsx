@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const { validarRegistro } = require('../servicios/validaciones');
 const { crearToken, verificarToken } = require('../servicios/tokens');
+const { obtenerTokenCsrf } = require('../middleware/seguridad');
 
 const COSTO_BCRYPT = 10;
 
@@ -83,6 +84,11 @@ module.exports = function ({ config, repos, correo }) {
 
     await repos.usuarios.activarCuenta(usuario.id_usuario);
     return res.json({ mensaje: 'Cuenta activada correctamente. Ya puedes iniciar sesión.' });
+  });
+
+    // El frontend pide este token antes de enviar formularios
+  router.get('/csrf', (req, res) => {
+    res.json({ token: obtenerTokenCsrf(req) });
   });
   return router;
 };

@@ -1,10 +1,27 @@
 const path = require('path');
 const express = require('express');
 const { montarRutas } = require('./rutas');
+const session = require('express-session');
+const { csrf } = require('./middleware/seguridad');
 
 function crearApp({ config, repos, correo }) {
   const app = express();
   app.use(express.json());
+    // Sesión en memoria (suficiente para desarrollo); cookie httpOnly que se renueva con la actividad
+  app.use(session({
+    name: 'sid',
+    secret: config.secreto,
+    resave: false,
+    saveUninitialized: false,
+    rolling: true,
+    cookie: {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: config.entorno === 'production',
+      maxAge: config.sesion.inactividadMs,
+    },
+  }));
+  app.use('/api', csrf);
 
   app.get('/api/salud', (req, res) => res.json({ estado: 'ok' }));
 
