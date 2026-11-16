@@ -3,7 +3,7 @@ function crearRepoUsuarios(pool) {
   return {
     async buscarPorCorreo(correo) {
       const [filas] = await pool.query(
-        `SELECT id_usuario, nombre, apellidos, correo_institucional, contrasena_hash, rol, estado_cuenta
+        `SELECT id_usuario, nombre, apellidos, correo_institucional, contrasena_hash, rol, estado_cuenta, semestre
            FROM usuario WHERE correo_institucional = ?`,
         [correo]
       );

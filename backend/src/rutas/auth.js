@@ -146,6 +146,7 @@ module.exports = function ({ config, repos, correo }) {
       apellidos: usuario.apellidos,
       correo: usuario.correo_institucional,
       rol: usuario.rol,
+      semestre: usuario.semestre,
     };
     return res.json({ usuario: req.session.usuario, csrf: obtenerTokenCsrf(req) });
   });
