@@ -1,3 +1,4 @@
+//archivo validacion.js en rutas 
 const { Router } = require('express');
 const { requiereRol } = require('../middleware/seguridad');
 const { generarCodigo, validarDecision } = require('../servicios/validacionDocente');
