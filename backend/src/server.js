@@ -6,6 +6,7 @@ const { crearServicioCorreo } = require('./servicios/correo');
 const { crearRepoMaterias } = require('./repositorios/materias');
 const { crearRepoMateriales } = require('./repositorios/materiales');
 const { crearRepoValidaciones } = require('./repositorios/validaciones');
+const { crearRepoMisMateriales } = require('./repositorios/misMateriales');
 
 async function iniciar() {
   const pool = crearPool(config.db);
@@ -19,7 +20,7 @@ async function iniciar() {
 
   const app = crearApp({
     config,
-    repos: { usuarios: crearRepoUsuarios(pool), materias: crearRepoMaterias(pool),  materiales: crearRepoMateriales(pool), validaciones: crearRepoValidaciones(pool),},
+    repos: { usuarios: crearRepoUsuarios(pool), materias: crearRepoMaterias(pool),  materiales: crearRepoMateriales(pool), validaciones: crearRepoValidaciones(pool), misMateriales: crearRepoMisMateriales(pool),},
     correo: crearServicioCorreo(),
   });
 
