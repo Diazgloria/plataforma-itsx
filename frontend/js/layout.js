@@ -11,6 +11,7 @@ const MENU = {
   docente: [
     { id: 'inicio', texto: '🏠 Inicio', href: 'panel.html' },
     { id: 'buscar', texto: '🔍 Buscar / Catálogo', href: 'buscar.html' },
+    { id: 'validar', texto: '✅ Validar Materiales', href: 'validar.html' },
     { id: 'semestres', texto: '📅 Semestres', href: 'semestres.html' },
     { id: 'perfil', texto: '👤 Mi perfil', href: 'perfil.html' },
   ],
