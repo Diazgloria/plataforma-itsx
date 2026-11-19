@@ -1,119 +1,57 @@
-// Acceso a los datos del proceso de validación docente.
+// Validaciones de los datos de registro (RF-AUT-01 a RF-AUT-04).
 
-// Inserta el código de validación; si por casualidad ya existe, genera otro (hasta 5 intentos)
-async function insertarCodigo(conexion, idValidacion, idMaterial, numeroVersion, generarCodigo) {
-  for (let intento = 0; intento < 5; intento++) {
-    const codigo = generarCodigo(numeroVersion);
-    try {
-      await conexion.query(
-        `INSERT INTO codigo_validacion (id_validacion, id_material, codigo, fecha_emision)
-         VALUES (?, ?, ?, CURDATE())`,
-        [idValidacion, idMaterial, codigo]
-      );
-      return codigo;
-    } catch (err) {
-      if (err.code !== 'ER_DUP_ENTRY') throw err;
-    }
-  }
-  throw new Error('No se pudo generar un código de validación único.');
+const REGEX_CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// RF-AUT-04: mínimo 8 caracteres, con mayúscula, minúscula y número.
+function validarContrasena(contrasena) {
+  const faltantes = [];
+  if (typeof contrasena !== 'string' || contrasena.length < 8) faltantes.push('mínimo 8 caracteres');
+  if (!/[A-ZÁÉÍÓÚÑ]/.test(contrasena || '')) faltantes.push('al menos una mayúscula');
+  if (!/[a-záéíóúñ]/.test(contrasena || '')) faltantes.push('al menos una minúscula');
+  if (!/[0-9]/.test(contrasena || '')) faltantes.push('al menos un número');
+  return faltantes;
 }
 
-function crearRepoValidaciones(pool) {
-  return {
-    // Materiales pendientes de las materias que imparte el docente (los más antiguos primero)
-    async listarPendientes(idDocente) {
-      const [filas] = await pool.query(
-        `SELECT m.id_material, m.titulo, m.descripcion, m.fecha_carga,
-                ma.nombre AS materia, ma.clave AS materia_clave,
-                CONCAT(u.nombre, ' ', u.apellidos) AS autor,
-                v.formato, v.tamano_bytes
-           FROM material m
-           JOIN docente_materia dm ON dm.id_materia = m.id_materia AND dm.id_docente = ?
-           JOIN materia ma ON ma.id_materia = m.id_materia
-           JOIN usuario u ON u.id_usuario = m.id_autor
-           JOIN version_material v ON v.id_material = m.id_material AND v.vigente = TRUE
-          WHERE m.estado = 'pendiente_validacion'
-          ORDER BY m.fecha_carga ASC, m.id_material ASC`,
-        [idDocente]
-      );
-      return filas;
-    },
+function limpiar(valor) {
+  return typeof valor === 'string' ? valor.trim() : '';
+}
 
-    // Un material pendiente, solo si el docente imparte su materia
-    async obtenerPendiente(idMaterial, idDocente) {
-      const [filas] = await pool.query(
-        `SELECT m.id_material, m.titulo, m.descripcion, m.palabras_clave, m.fecha_carga,
-                ma.nombre AS materia, ma.clave AS materia_clave,
-                CONCAT(u.nombre, ' ', u.apellidos) AS autor,
-                v.numero AS version, v.nombre_archivo, v.formato, v.tamano_bytes
-           FROM material m
-           JOIN docente_materia dm ON dm.id_materia = m.id_materia AND dm.id_docente = ?
-           JOIN materia ma ON ma.id_materia = m.id_materia
-           JOIN usuario u ON u.id_usuario = m.id_autor
-           JOIN version_material v ON v.id_material = m.id_material AND v.vigente = TRUE
-          WHERE m.id_material = ? AND m.estado = 'pendiente_validacion'`,
-        [idDocente, idMaterial]
-      );
-      return filas[0] || null;
-    },
-
-    // Registra la decisión en una sola transacción: validación, código (si se aprueba),
-    // nuevo estado del material y notificación al autor. Devuelve null si el material
-    // ya no está pendiente o el docente no imparte esa materia.
-    async registrarDecision({ idMaterial, idDocente, decision, comentario, generarCodigo }) {
-      const conexion = await pool.getConnection();
-      try {
-        await conexion.beginTransaction();
-
-        // FOR UPDATE: bloquea el material para que dos docentes no lo validen a la vez
-        const [filas] = await conexion.query(
-          `SELECT m.id_material, m.id_autor, m.titulo, v.numero
-             FROM material m
-             JOIN docente_materia dm ON dm.id_materia = m.id_materia AND dm.id_docente = ?
-             JOIN version_material v ON v.id_material = m.id_material AND v.vigente = TRUE
-            WHERE m.id_material = ? AND m.estado = 'pendiente_validacion'
-              FOR UPDATE OF m`,
-          [idDocente, idMaterial]
-        );
-        if (filas.length === 0) {
-          await conexion.rollback();
-          return null;
-        }
-        const material = filas[0];
-
-        const [validacion] = await conexion.query(
-          'INSERT INTO validacion_docente (id_material, id_docente, decision, comentario) VALUES (?, ?, ?, ?)',
-          [idMaterial, idDocente, decision, comentario || null]
-        );
-
-        let codigo = null;
-        if (decision === 'aprobado') {
-          codigo = await insertarCodigo(conexion, validacion.insertId, idMaterial, material.numero, generarCodigo);
-        }
-
-        await conexion.query('UPDATE material SET estado = ? WHERE id_material = ?', [
-          decision === 'aprobado' ? 'validado' : 'rechazado',
-          idMaterial,
-        ]);
-
-        const mensaje = decision === 'aprobado'
-          ? `Tu material "${material.titulo}" fue validado.`
-          : `Tu material "${material.titulo}" fue rechazado. Revisa el comentario del docente.`;
-        await conexion.query(
-          'INSERT INTO notificacion (id_usuario, id_material, tipo, mensaje) VALUES (?, ?, ?, ?)',
-          [material.id_autor, idMaterial, decision === 'aprobado' ? 'material_validado' : 'material_rechazado', mensaje]
-        );
-
-        await conexion.commit();
-        return { codigo, titulo: material.titulo };
-      } catch (err) {
-        await conexion.rollback();
-        throw err;
-      } finally {
-        conexion.release();
-      }
-    },
+// Devuelve { errores: [...], datos: {...} }
+function validarRegistro(body, dominioPermitido) {
+  const errores = [];
+  const datos = {
+    nombre: limpiar(body.nombre),
+    apellidos: limpiar(body.apellidos),
+    correo: limpiar(body.correo).toLowerCase(),
+    numeroControl: limpiar(body.numeroControl).toUpperCase(),
+    semestre: Number(body.semestre),
+    contrasena: typeof body.contrasena === 'string' ? body.contrasena : '',
   };
+
+  if (!datos.nombre) errores.push('El nombre es obligatorio.');
+  if (datos.nombre.length > 80) errores.push('El nombre no puede tener más de 80 caracteres.');
+  if (!datos.apellidos) errores.push('Los apellidos son obligatorios.');
+  if (datos.apellidos.length > 100) errores.push('Los apellidos no pueden tener más de 100 caracteres.');
+
+  if (!REGEX_CORREO.test(datos.correo)) {
+    errores.push('Escribe un correo electrónico válido.');
+  } else if (!datos.correo.endsWith('@' + dominioPermitido)) {
+    // RF-AUT-02: solo correos del dominio institucional
+    errores.push(`El correo debe ser institucional (termina en @${dominioPermitido}).`);
+  }
+
+  if (!/^[A-Z0-9]{5,20}$/.test(datos.numeroControl)) {
+    errores.push('El número de control debe tener entre 5 y 20 letras o números.');
+  }
+
+  if (!Number.isInteger(datos.semestre) || datos.semestre < 1 || datos.semestre > 12) {
+    errores.push('El semestre debe ser un número entre 1 y 12.');
+  }
+
+  const faltantes = validarContrasena(datos.contrasena);
+  if (faltantes.length) errores.push('La contraseña debe tener: ' + faltantes.join(', ') + '.');
+
+  return { errores, datos };
 }
 
-module.exports = { crearRepoValidaciones };
+module.exports = { validarRegistro, validarContrasena };
