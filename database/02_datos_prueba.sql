@@ -12,7 +12,7 @@ INSERT INTO usuario (id_usuario, nombre, apellidos, correo_institucional, contra
 (5, 'Estudiante', 'Dos',    'estudiante2@itsx.example', '$2b$10$SBvqWOvBXSalxPvUlWxz0eHg.HfO//DWo4XrzsjKjvV47yQL3M.02', 'estudiante',    'activa', 'TEST00002', 2,    NULL);
 
 INSERT INTO materia (id_materia, clave, nombre, semestre, descripcion) VALUES
-(1, '	ACF0902', 'Cálculo Integral',          2, 'Materia de tronco común '),
+(1, 'ACF0902', 'Cálculo Integral',          2, 'Materia de tronco común '),
 (2, 'ACF0903', 'Álgebra Lineal',               1, 'Materia de tronco común'),
 (3, 'ACF0905', 'Ecuaciones Diferenciales',   3, 'Materia de tronco común');
 
