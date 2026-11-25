@@ -85,3 +85,12 @@ label.casilla input { width: auto; margin-top: 3px; }
 .solo-lectura { display: flex; gap: 12px; margin-top: 8px; padding: 8px 12px; background: #f1f5f9; border: 1px solid var(--borde); border-radius: 6px; font-size: .9rem; }
 .solo-lectura b { min-width: 150px; }
 .subtitulo-lectura { margin: 18px 0 0; font-size: .9rem; color: var(--gris); }
+
+/* ---------- Detalle del material (PT-08) ---------- */
+.detalle { background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,.12); padding: 18px 22px; max-width: 760px; margin-top: 14px; }
+.detalle .fila { display: flex; gap: 12px; padding: 7px 0; border-bottom: 1px solid #eef2f7; font-size: .92rem; }
+.detalle .fila b { min-width: 170px; color: var(--gris); font-weight: 700; }
+.detalle .fila span { word-break: break-all; }
+.acciones { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; align-items: center; }
+.acciones button { width: auto; margin: 0; padding: 9px 18px; }
+.acciones a { font-weight: 700; color: #0b5cad; }

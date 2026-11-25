@@ -45,7 +45,9 @@
       }
       const enlace = elemento('a', '', 'Descargar Documento');
       enlace.href = `/api/materiales/${m.id_material}/archivo`;
-      tarjeta.appendChild(enlace);
+      const detalle = elemento('a', '', 'Ver detalle');
+      detalle.href = `detalle.html?id=${m.id_material}`;
+      tarjeta.append(enlace, ' · ', detalle);
       lista.appendChild(tarjeta);
     });
   }
