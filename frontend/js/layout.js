@@ -5,6 +5,7 @@ const MENU = {
     { id: 'buscar', texto: '🔍 Buscar / Catálogo', href: 'buscar.html' },
     { id: 'subir-material', texto: '📤 Subir Material', href: 'subir-material.html' },
     { id: 'mis-materiales', texto: '📁 Mis Materiales', href: 'mis-materiales.html' },
+    { id: 'favoritos', texto: '⭐ Mis Favoritos', href: 'favoritos.html' },
     { id: 'mis-materias', texto: '📚 Mis Materias', href: 'mis-materias.html' },
     { id: 'semestres', texto: '📅 Semestres', href: 'semestres.html' },
     { id: 'perfil', texto: '👤 Mi perfil', href: 'perfil.html' },
