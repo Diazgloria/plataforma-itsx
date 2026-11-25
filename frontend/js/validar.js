@@ -19,7 +19,17 @@
     vista.appendChild(elemento('h2', '', 'Materiales pendientes de revisión'));
 
     try {
-      const { materiales } = await api('/validacion/pendientes');
+      const todos = (await api('/validacion/pendientes')).materiales;
+      // Desde "Mis materias asignadas" se abre la cola filtrada por la clave de la materia
+      const clave = new URLSearchParams(window.location.search).get('clave');
+      const materiales = clave ? todos.filter((m) => String(m.materia_clave).trim() === clave) : todos;
+      if (clave) {
+        const filtro = elemento('p', 'intro', `Mostrando solo la materia ${clave}. `);
+        const quitar = elemento('a', '', 'Ver todas');
+        quitar.href = 'validar.html';
+        filtro.appendChild(quitar);
+        vista.appendChild(filtro);
+      }
       if (materiales.length === 0) {
         vista.appendChild(elemento('p', 'vacio', 'No hay materiales pendientes de validar en tus materias.'));
         return;
