@@ -85,17 +85,7 @@ label.casilla input { width: auto; margin-top: 3px; }
 .solo-lectura { display: flex; gap: 12px; margin-top: 8px; padding: 8px 12px; background: #f1f5f9; border: 1px solid var(--borde); border-radius: 6px; font-size: .9rem; }
 .solo-lectura b { min-width: 150px; }
 .subtitulo-lectura { margin: 18px 0 0; font-size: .9rem; color: var(--gris); }
-
-/* ---------- Detalle del material (PT-08) ---------- */
-.detalle { background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,.12); padding: 18px 22px; max-width: 760px; margin-top: 14px; }
-.detalle .fila { display: flex; gap: 12px; padding: 7px 0; border-bottom: 1px solid #eef2f7; font-size: .92rem; }
-.detalle .fila b { min-width: 170px; color: var(--gris); font-weight: 700; }
-.detalle .fila span { word-break: break-all; }
-.acciones { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; align-items: center; }
-.acciones button { width: auto; margin: 0; padding: 9px 18px; }
-.acciones a { font-weight: 700; color: #0b5cad; }
-
-/* ---------- Campana y notificaciones (PT-06) ---------- */
+/* ---------- Campana de notificaciones y pantallas del Bloque A ---------- */
 .barra { display: flex; justify-content: flex-end; margin-bottom: 4px; }
 .campana { position: relative; text-decoration: none; font-size: 1.4rem; padding: 2px 8px; }
 .contador { position: absolute; top: -6px; right: -4px; background: var(--rojo); color: #fff; font-size: .65rem; font-weight: 700; padding: 1px 6px; border-radius: 999px; }
@@ -109,3 +99,18 @@ label.casilla input { width: auto; margin-top: 3px; }
 .aviso.no-leido .texto { font-weight: 700; }
 .aviso .pequeno { font-size: .75rem; color: var(--gris); margin-top: 4px; }
 .aviso button { width: auto; margin: 8px 0 0; padding: 6px 14px; font-size: .85rem; }
+.detalle { background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,.12); padding: 18px 22px; max-width: 760px; margin-top: 14px; }
+.detalle .fila { display: flex; gap: 12px; padding: 7px 0; border-bottom: 1px solid #eef2f7; font-size: .92rem; }
+.detalle .fila b { min-width: 170px; color: var(--gris); font-weight: 700; }
+.detalle .fila span { word-break: break-all; }
+.acciones { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; align-items: center; }
+.acciones button { width: auto; margin: 0; padding: 9px 18px; }
+.acciones a { font-weight: 700; color: #0b5cad; }
+
+/* Estados de material y de cuentas (pantallas del administrador) */
+.insignia.suspendido { background: #ea580c; }
+.insignia.retirado, .insignia.inactivo, .insignia.suspendida { background: #64748b; }
+.insignia.eliminado { background: #1f2937; }
+.insignia.activa, .insignia.activo { background: var(--verde); }
+button.peligro { background: var(--rojo); }
+.panel form label:first-child { margin-top: 0; }
