@@ -1,6 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const { requiereRol, requiereSesion } = require('../middleware/seguridad');
+const { puedeVerMaterial } = require('../servicios/accesoMaterial');
 const { formatoDeNombre, coincideFirma, huellaSha256, nombreOriginal, crearAlmacen } = require('../servicios/archivos');
 
 module.exports = function ({ config, repos }) {
@@ -91,16 +92,21 @@ module.exports = function ({ config, repos }) {
 
     const material = await repos.materiales.obtenerArchivoVigente(id);
     const usuario = req.session.usuario;
-    const puede = material && (
-      material.estado === 'validado' ||
-      material.id_autor === usuario.id ||
-      usuario.rol === 'docente' || usuario.rol === 'administrador'
-    );
-    if (!puede) return res.status(404).json({ error: 'El material no existe o no está disponible.' });
+    if (!puedeVerMaterial(material, usuario)) {
+      return res.status(404).json({ error: 'El material no existe o no está disponible.' });
+    }
 
     const ruta = almacen.rutaDe(material.id_material, material.numero, material.formato);
-    res.download(ruta, material.nombre_archivo, (err) => {
-      if (err && !res.headersSent) res.status(404).json({ error: 'El archivo no está disponible en el servidor.' });
+    res.download(ruta, material.nombre_archivo, async (err) => {
+      if (err) {
+        if (!res.headersSent) res.status(404).json({ error: 'El archivo no está disponible en el servidor.' });
+        return;
+      }
+      // Se registra la descarga de los materiales validados
+      if (material.estado === 'validado' && repos.detalleMaterial) {
+        try { await repos.detalleMaterial.registrarDescarga(material.id_material, usuario.id); }
+        catch (e) { console.error('No se pudo registrar la descarga:', e.message); }
+      }
     });
   });
 
