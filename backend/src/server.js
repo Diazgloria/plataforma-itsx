@@ -8,7 +8,9 @@ const { crearRepoMateriales } = require('./repositorios/materiales');
 const { crearRepoValidaciones } = require('./repositorios/validaciones');
 const { crearRepoMisMateriales } = require('./repositorios/misMateriales');
 const { crearRepoFavoritos } = require('./repositorios/favoritos');
+feature/pt08-detalle-material
 const { crearRepoDetalleMaterial } = require('./repositorios/detalleMaterial');
+develop
 
 async function iniciar() {
   const pool = crearPool(config.db);
@@ -29,7 +31,10 @@ async function iniciar() {
       validaciones: crearRepoValidaciones(pool),
       misMateriales: crearRepoMisMateriales(pool),
       favoritos: crearRepoFavoritos(pool),
+feature/pt08-detalle-material
       detalleMaterial: crearRepoDetalleMaterial(pool),
+
+ develop
     },
     correo: crearServicioCorreo(),
   });
