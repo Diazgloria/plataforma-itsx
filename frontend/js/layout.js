@@ -71,5 +71,22 @@ async function cargarLayout(paginaActiva) {
 
   const contenido = elemento('main', 'contenido');
   raiz.append(lateral, contenido);
+  // Campana de notificaciones con el número de avisos sin leer (visible para los tres roles)
+  const barra = elemento('div', 'barra');
+  const campana = elemento('a', 'campana', '🔔');
+  campana.href = 'notificaciones.html';
+  campana.title = 'Notificaciones';
+  const contador = elemento('span', 'contador');
+  contador.hidden = true;
+  campana.appendChild(contador);
+  barra.appendChild(campana);
+  contenido.appendChild(barra);
+  api('/notificaciones/contador').then(({ total }) => {
+    if (total > 0) {
+      contador.textContent = total > 99 ? '99+' : String(total);
+      contador.hidden = false;
+    }
+  }).catch(() => { /* la campana es opcional: si falla, la página funciona igual */ });
+
   return { usuario, contenido };
 }
