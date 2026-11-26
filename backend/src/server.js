@@ -12,6 +12,7 @@ const { crearRepoDetalleMaterial } = require('./repositorios/detalleMaterial');
 const { crearRepoFavoritos } = require('./repositorios/favoritos');
 const { crearRepoDocentes } = require('./repositorios/docentes');
 const { crearRepoCatalogo } = require('./repositorios/catalogo');
+const { crearRepoCuentas } = require('./repositorios/cuentas');
 
 async function iniciar() {
   const pool = crearPool(config.db);
@@ -36,6 +37,7 @@ async function iniciar() {
       favoritos: crearRepoFavoritos(pool),
       docentes: crearRepoDocentes(pool),
       catalogo: crearRepoCatalogo(pool),
+      cuentas: crearRepoCuentas(pool),
     },
     correo: crearServicioCorreo(),
   });
