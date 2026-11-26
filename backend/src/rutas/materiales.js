@@ -21,6 +21,7 @@ module.exports = function ({ config, repos }) {
     const descripcion = String(cuerpo.descripcion || '').trim();
     const palabrasClave = String(cuerpo.palabrasClave || '').trim();
     const idMateria = Number(cuerpo.idMateria);
+    const idTipo = cuerpo.idTipo ? Number(cuerpo.idTipo) : null; // el tipo es opcional
     const declaracion = cuerpo.declaracion === 'true' || cuerpo.declaracion === 'on';
 
     const faltantes = [];
@@ -47,6 +48,11 @@ module.exports = function ({ config, repos }) {
     const materia = await repos.materias.buscarActivaPorId(idMateria);
     if (!materia) return res.status(400).json({ error: 'La materia seleccionada no existe o está inactiva.' });
 
+    if (idTipo !== null) {
+      const tipo = Number.isInteger(idTipo) && idTipo > 0 ? await repos.tipos.obtener(idTipo) : null;
+      if (!tipo || !tipo.activo) return res.status(400).json({ error: 'El tipo de material seleccionado no existe o está inactivo.' });
+    }
+
     const huella = huellaSha256(req.file.buffer);
     if (await repos.materiales.existeHuellaVigente(huella)) {
       return res.status(409).json({ error: 'Ya existe un material con el mismo archivo en la plataforma.' });
@@ -56,7 +62,7 @@ module.exports = function ({ config, repos }) {
     try {
       idMaterial = await repos.materiales.crear(
         {
-          idAutor: req.session.usuario.id, idMateria, titulo,
+          idAutor: req.session.usuario.id, idMateria, idTipo, titulo,
           descripcion: descripcion || null, palabrasClave: palabrasClave || null,
           archivo: { nombre, formato, tamano: req.file.size, huella },
         },
@@ -75,7 +81,7 @@ module.exports = function ({ config, repos }) {
     });
   });
 
-    // Catálogo de materiales validados: ?q=texto&materia=id
+    // Catálogo de materiales validados: ?q=texto&materia=id&tipo=id
   router.get('/', requiereSesion, async (req, res) => {
     const texto = String(req.query.q || '').trim().slice(0, 100);
     let idMateria = null;
@@ -85,7 +91,12 @@ module.exports = function ({ config, repos }) {
         return res.status(400).json({ error: 'Materia inválida.' });
       }
     }
-    res.json({ materiales: await repos.materiales.buscarValidados({ texto, idMateria }) });
+    let idTipo = null;
+    if (req.query.tipo) {
+      idTipo = Number(req.query.tipo);
+      if (!Number.isInteger(idTipo) || idTipo < 1) return res.status(400).json({ error: 'Tipo inválido.' });
+    }
+    res.json({ materiales: await repos.materiales.buscarValidados({ texto, idMateria, idTipo }) });
   });
 
   // Descarga del archivo vigente: validado para cualquiera con sesión; los demás estados, solo el autor, docentes y administradores

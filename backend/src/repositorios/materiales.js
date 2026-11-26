@@ -17,14 +17,14 @@ function crearRepoMateriales(pool) {
 
     // Registra el material y su primera versión en una sola transacción.
     // guardarArchivo escribe el archivo en disco antes de confirmar; si falla, se revierte todo.
-    async crear({ idAutor, idMateria, titulo, descripcion, palabrasClave, archivo }, guardarArchivo) {
+    async crear({ idAutor, idMateria, idTipo = null, titulo, descripcion, palabrasClave, archivo }, guardarArchivo) {
       const conexion = await pool.getConnection();
       try {
         await conexion.beginTransaction();
         const [material] = await conexion.query(
-          `INSERT INTO material (id_autor, id_materia, titulo, descripcion, palabras_clave, declaracion_originalidad)
-           VALUES (?, ?, ?, ?, ?, TRUE)`,
-          [idAutor, idMateria, titulo, descripcion, palabrasClave]
+          `INSERT INTO material (id_autor, id_materia, id_tipo, titulo, descripcion, palabras_clave, declaracion_originalidad)
+           VALUES (?, ?, ?, ?, ?, ?, TRUE)`,
+          [idAutor, idMateria, idTipo, titulo, descripcion, palabrasClave]
         );
         const idMaterial = material.insertId;
         await conexion.query(
@@ -44,11 +44,11 @@ function crearRepoMateriales(pool) {
       }
     },
         // Catálogo: solo materiales validados, con filtro opcional por materia y por texto
-    async buscarValidados({ texto = '', idMateria = null }) {
+    async buscarValidados({ texto = '', idMateria = null, idTipo = null }) {
       const patron = texto ? `%${texto.replace(/[\\%_]/g, '\\$&')}%` : null;
       const [filas] = await pool.query(
         `SELECT m.id_material, m.titulo, m.descripcion, m.fecha_carga,
-                ma.nombre AS materia, ma.clave AS materia_clave,
+                ma.nombre AS materia, ma.clave AS materia_clave, t.nombre AS tipo,
                 CONCAT(u.nombre, ' ', u.apellidos) AS autor,
                 v.formato, v.tamano_bytes,
                 c.codigo AS codigo_validacion
@@ -57,11 +57,13 @@ function crearRepoMateriales(pool) {
            JOIN usuario u ON u.id_usuario = m.id_autor
            JOIN version_material v ON v.id_material = m.id_material AND v.vigente = TRUE
            LEFT JOIN codigo_validacion c ON c.id_material = m.id_material
+           LEFT JOIN tipo_material t ON t.id_tipo = m.id_tipo
           WHERE m.estado = 'validado'
             AND (? IS NULL OR m.id_materia = ?)
+            AND (? IS NULL OR m.id_tipo = ?)
             AND (? IS NULL OR m.titulo LIKE ? OR m.palabras_clave LIKE ? OR m.descripcion LIKE ?)
           ORDER BY m.fecha_carga DESC, m.id_material DESC`,
-        [idMateria, idMateria, patron, patron, patron, patron]
+        [idMateria, idMateria, idTipo, idTipo, patron, patron, patron, patron]
       );
       return filas;
     },
