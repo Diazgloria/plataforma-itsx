@@ -12,21 +12,25 @@ const MENU = {
   ],
   docente: [
     { id: 'inicio', texto: '🏠 Inicio', href: 'panel.html' },
+    { id: 'perfil', texto: '👤 Mi perfil', href: 'perfil.html' },
     { id: 'buscar', texto: '🔍 Buscar / Catálogo', href: 'buscar.html' },
     { id: 'validar', texto: '✅ Validar Materiales', href: 'validar.html' },
     { id: 'materias-asignadas', texto: '📚 Mis Materias Asignadas', href: 'materias-asignadas.html' },
     { id: 'semestres', texto: '📅 Semestres', href: 'semestres.html' },
-    { id: 'perfil', texto: '👤 Mi perfil', href: 'perfil.html' },
   ],
   administrador: [
     { id: 'inicio', texto: '🏠 Inicio', href: 'panel.html' },
+    { id: 'perfil', texto: '👤 Mi perfil', href: 'perfil.html' },
+    { id: 'semestres', texto: '📅 Semestres', href: 'semestres.html' },
     { id: 'buscar', texto: '🔍 Buscar / Catálogo', href: 'buscar.html' },
+    { id: 'estadisticas', texto: '📊 Estadísticas y Reportes', href: 'estadisticas.html' },
     { id: 'moderacion', texto: '🛡️ Moderación de Contenidos', href: 'moderacion.html' },
     { id: 'cuentas', texto: '👥 Gestión de Usuarios', href: 'cuentas.html' },
     { id: 'catalogo', texto: '🗂️ Catálogo de Materias', href: 'catalogo.html' },
     { id: 'tipos', texto: '🏷️ Tipos de Material', href: 'tipos.html' },
-    { id: 'semestres', texto: '📅 Semestres', href: 'semestres.html' },
-    { id: 'perfil', texto: '👤 Mi perfil', href: 'perfil.html' },
+    { id: 'parametros', texto: '⚙️ Parámetros del Sistema', href: 'parametros.html' },
+    { id: 'bitacora', texto: '📜 Bitácora de Auditoría', href: 'bitacora.html' },
+    
   ],
 };
 

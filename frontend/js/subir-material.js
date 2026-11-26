@@ -27,6 +27,17 @@
     mostrarMensaje(mensaje, 'error', error.message);
   }
 
+  // Los tipos activos también vienen de la base de datos (los administra el administrador)
+  try {
+    const { tipos } = await api('/tipos');
+    const selectorTipo = document.getElementById('idTipo');
+    tipos.forEach((tipo) => {
+      const opcion = elemento('option', '', tipo.nombre);
+      opcion.value = tipo.id_tipo;
+      selectorTipo.appendChild(opcion);
+    });
+  } catch (error) { /* el tipo es opcional: la subida funciona aunque falle la lista */ }
+
   formulario.addEventListener('submit', async (evento) => {
     evento.preventDefault();
     boton.disabled = true;

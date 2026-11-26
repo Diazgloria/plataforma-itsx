@@ -12,8 +12,12 @@
   const todas = elemento('option', '', 'Todas las Materias');
   todas.value = '';
   materia.appendChild(todas);
+  const tipo = elemento('select');
+  const todosTipos = elemento('option', '', 'Todos los Tipos');
+  todosTipos.value = '';
+  tipo.appendChild(todosTipos);
   const filtros = elemento('div', 'filtros');
-  filtros.append(texto, materia);
+  filtros.append(texto, materia, tipo);
   contenido.appendChild(filtros);
 
   const limpiar = elemento('button', 'secundario auto', '🧹 Limpiar Filtros');
@@ -36,7 +40,7 @@
       encabezado.appendChild(elemento('h3', '', m.titulo));
       encabezado.appendChild(elemento('span', 'insignia validado', 'Validado'));
       tarjeta.appendChild(encabezado);
-      tarjeta.appendChild(elemento('div', '', `Materia: ${m.materia} | Formato: ${m.formato}`));
+      tarjeta.appendChild(elemento('div', '', `Materia: ${m.materia} | Tipo: ${m.tipo || 'Sin clasificar'} | Formato: ${m.formato}`));
       if (m.descripcion) tarjeta.appendChild(elemento('div', '', m.descripcion));
       tarjeta.appendChild(elemento('div', 'pequeno',
         `Subido por: ${m.autor} el ${new Date(m.fecha_carga).toLocaleDateString('es-MX')}`));
@@ -56,6 +60,7 @@
     const parametros = new URLSearchParams();
     if (texto.value.trim()) parametros.set('q', texto.value.trim());
     if (materia.value) parametros.set('materia', materia.value);
+    if (tipo.value) parametros.set('tipo', tipo.value);
     const consulta = parametros.toString();
     try {
       const { materiales } = await api('/materiales' + (consulta ? `?${consulta}` : ''));
@@ -74,9 +79,19 @@
     });
   } catch (error) { /* el catálogo funciona aunque falle la lista de materias */ }
 
+  try {
+    const { tipos } = await api('/tipos');
+    tipos.forEach((t) => {
+      const opcion = elemento('option', '', t.nombre);
+      opcion.value = t.id_tipo;
+      tipo.appendChild(opcion);
+    });
+  } catch (error) { /* el catálogo funciona aunque falle la lista de tipos */ }
+
   let espera;
   texto.addEventListener('input', () => { clearTimeout(espera); espera = setTimeout(buscar, 300); });
   materia.addEventListener('change', buscar);
-  limpiar.addEventListener('click', () => { texto.value = ''; materia.value = ''; buscar(); });
+  tipo.addEventListener('change', buscar);
+  limpiar.addEventListener('click', () => { texto.value = ''; materia.value = ''; tipo.value = ''; buscar(); });
   buscar();
 })();
