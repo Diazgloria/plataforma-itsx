@@ -14,10 +14,9 @@ const { crearRepoDocentes } = require('./repositorios/docentes');
 const { crearRepoCatalogo } = require('./repositorios/catalogo');
 const { crearRepoCuentas } = require('./repositorios/cuentas');
 const { crearRepoModeracion } = require('./repositorios/moderacion');
-develop
 const { crearRepoTipos } = require('./repositorios/tipos');
-
-main
+const { crearRepoParametros } = require('./repositorios/parametros');
+const { cargarParametros } = require('./servicios/parametros');
 
 async function iniciar() {
   const pool = crearPool(config.db);
@@ -29,28 +28,27 @@ async function iniciar() {
     process.exit(1);
   }
 
-  const app = crearApp({
-    config,
-    repos: {
-      usuarios: crearRepoUsuarios(pool),
-      materias: crearRepoMaterias(pool),
-      materiales: crearRepoMateriales(pool),
-      validaciones: crearRepoValidaciones(pool),
-      misMateriales: crearRepoMisMateriales(pool),
-      notificaciones: crearRepoNotificaciones(pool),
-      detalleMaterial: crearRepoDetalleMaterial(pool),
-      favoritos: crearRepoFavoritos(pool),
-      docentes: crearRepoDocentes(pool),
-      catalogo: crearRepoCatalogo(pool),
-      cuentas: crearRepoCuentas(pool),
-      moderacion: crearRepoModeracion(pool),
-develop
-      tipos: crearRepoTipos(pool),
+  const repos = {
+    usuarios: crearRepoUsuarios(pool),
+    materias: crearRepoMaterias(pool),
+    materiales: crearRepoMateriales(pool),
+    validaciones: crearRepoValidaciones(pool),
+    misMateriales: crearRepoMisMateriales(pool),
+    notificaciones: crearRepoNotificaciones(pool),
+    detalleMaterial: crearRepoDetalleMaterial(pool),
+    favoritos: crearRepoFavoritos(pool),
+    docentes: crearRepoDocentes(pool),
+    catalogo: crearRepoCatalogo(pool),
+    cuentas: crearRepoCuentas(pool),
+    moderacion: crearRepoModeracion(pool),
+    tipos: crearRepoTipos(pool),
+    parametros: crearRepoParametros(pool),
+  };
 
-main
-    },
-    correo: crearServicioCorreo(),
-  });
+  // Los parámetros guardados por el administrador tienen prioridad sobre los valores de config.js
+  await cargarParametros(repos.parametros, config);
+
+  const app = crearApp({ config, repos, correo: crearServicioCorreo() });
 
   app.listen(config.puerto, () => {
     console.log(`Servidor escuchando en http://localhost:${config.puerto}`);
