@@ -24,6 +24,7 @@ const MENU = {
     { id: 'moderacion', texto: '🛡️ Moderación de Contenidos', href: 'moderacion.html' },
     { id: 'cuentas', texto: '👥 Gestión de Usuarios', href: 'cuentas.html' },
     { id: 'catalogo', texto: '🗂️ Catálogo de Materias', href: 'catalogo.html' },
+    { id: 'tipos', texto: '🏷️ Tipos de Material', href: 'tipos.html' },
     { id: 'semestres', texto: '📅 Semestres', href: 'semestres.html' },
     { id: 'perfil', texto: '👤 Mi perfil', href: 'perfil.html' },
   ],
