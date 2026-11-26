@@ -8,11 +8,14 @@ module.exports = function ({ config, repos }) {
   const router = express.Router();
   const almacen = crearAlmacen(config.carpetaArchivos);
 
-  // El archivo llega en memoria (máximo 20 MB) para calcular su huella antes de guardarlo
-  const subida = multer({ storage: multer.memoryStorage(), limits: { fileSize: config.tamanoMaximoBytes, files: 1 } });
+  // El archivo llega en memoria para calcular su huella antes de guardarlo. El límite se lee en cada
+  // petición para que un cambio en "Parámetros del sistema" se aplique sin reiniciar el servidor.
+  const subirArchivo = (req, res, next) => multer({
+    storage: multer.memoryStorage(), limits: { fileSize: config.tamanoMaximoBytes, files: 1 },
+  }).single('archivo')(req, res, next);
 
   // Un estudiante sube un material; queda pendiente de validación por un docente
-  router.post('/', requiereRol('estudiante'), subida.single('archivo'), async (req, res) => {
+  router.post('/', requiereRol('estudiante'), subirArchivo, async (req, res) => {
     const cuerpo = req.body || {};
     const titulo = String(cuerpo.titulo || '').trim();
     const descripcion = String(cuerpo.descripcion || '').trim();
