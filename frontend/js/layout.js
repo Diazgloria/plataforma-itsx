@@ -26,6 +26,7 @@ const MENU = {
     { id: 'catalogo', texto: '🗂️ Catálogo de Materias', href: 'catalogo.html' },
     { id: 'tipos', texto: '🏷️ Tipos de Material', href: 'tipos.html' },
     { id: 'parametros', texto: '⚙️ Parámetros del Sistema', href: 'parametros.html' },
+    { id: 'bitacora', texto: '📜 Bitácora de Auditoría', href: 'bitacora.html' },
     { id: 'semestres', texto: '📅 Semestres', href: 'semestres.html' },
     { id: 'perfil', texto: '👤 Mi perfil', href: 'perfil.html' },
   ],

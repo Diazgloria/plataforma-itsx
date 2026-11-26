@@ -3,6 +3,7 @@ const express = require('express');
 const { montarRutas } = require('./rutas');
 const session = require('express-session');
 const { csrf } = require('./middleware/seguridad');
+const { crearAuditoria } = require('./middleware/auditoria');
 
 function crearApp({ config, repos, correo }) {
   const app = express();
@@ -22,6 +23,7 @@ function crearApp({ config, repos, correo }) {
     },
   }));
   app.use('/api', csrf);
+  app.use('/api', crearAuditoria(repos)); // bitácora de auditoría (PT-21)
 
   app.get('/api/salud', (req, res) => res.json({ estado: 'ok' }));
 

@@ -114,3 +114,10 @@ label.casilla input { width: auto; margin-top: 3px; }
 .insignia.activa, .insignia.activo { background: var(--verde); }
 button.peligro { background: var(--rojo); }
 .panel form label:first-child { margin-top: 0; }
+
+/* Tablas de consulta (bitácora, estadísticas) */
+.tabla-scroll { overflow-x: auto; }
+table.tabla { width: 100%; border-collapse: collapse; background: #fff; font-size: 0.9rem; }
+table.tabla th, table.tabla td { padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--borde); text-align: left; vertical-align: top; }
+table.tabla th { background: var(--marino); color: #fff; white-space: nowrap; }
+.paginacion { display: flex; gap: 0.75rem; align-items: center; justify-content: center; margin: 1rem 0; }

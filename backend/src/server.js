@@ -16,6 +16,7 @@ const { crearRepoCuentas } = require('./repositorios/cuentas');
 const { crearRepoModeracion } = require('./repositorios/moderacion');
 const { crearRepoTipos } = require('./repositorios/tipos');
 const { crearRepoParametros } = require('./repositorios/parametros');
+const { crearRepoBitacora } = require('./repositorios/bitacora');
 const { cargarParametros } = require('./servicios/parametros');
 
 async function iniciar() {
@@ -43,6 +44,7 @@ async function iniciar() {
     moderacion: crearRepoModeracion(pool),
     tipos: crearRepoTipos(pool),
     parametros: crearRepoParametros(pool),
+    bitacora: crearRepoBitacora(pool),
   };
 
   // Los parámetros guardados por el administrador tienen prioridad sobre los valores de config.js
