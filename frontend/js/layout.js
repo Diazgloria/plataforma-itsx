@@ -21,6 +21,7 @@ const MENU = {
   administrador: [
     { id: 'inicio', texto: '🏠 Inicio', href: 'panel.html' },
     { id: 'buscar', texto: '🔍 Buscar / Catálogo', href: 'buscar.html' },
+    { id: 'cuentas', texto: '👥 Gestión de Usuarios', href: 'cuentas.html' },
     { id: 'catalogo', texto: '🗂️ Catálogo de Materias', href: 'catalogo.html' },
     { id: 'semestres', texto: '📅 Semestres', href: 'semestres.html' },
     { id: 'perfil', texto: '👤 Mi perfil', href: 'perfil.html' },
