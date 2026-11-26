@@ -21,6 +21,7 @@ const MENU = {
   administrador: [
     { id: 'inicio', texto: '🏠 Inicio', href: 'panel.html' },
     { id: 'buscar', texto: '🔍 Buscar / Catálogo', href: 'buscar.html' },
+    { id: 'catalogo', texto: '🗂️ Catálogo de Materias', href: 'catalogo.html' },
     { id: 'semestres', texto: '📅 Semestres', href: 'semestres.html' },
     { id: 'perfil', texto: '👤 Mi perfil', href: 'perfil.html' },
   ],
@@ -72,6 +73,7 @@ async function cargarLayout(paginaActiva) {
 
   const contenido = elemento('main', 'contenido');
   raiz.append(lateral, contenido);
+
   // Campana de notificaciones con el número de avisos sin leer (visible para los tres roles)
   const barra = elemento('div', 'barra');
   const campana = elemento('a', 'campana', '🔔');
