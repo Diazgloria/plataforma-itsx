@@ -116,4 +116,4 @@ function crearRepoValidaciones(pool) {
   };
 }
 
-module.exports = { crearRepoValidaciones };
+module.exports = { crearRepoValidaciones, insertarCodigo };
