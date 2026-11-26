@@ -7,10 +7,11 @@ const { crearRepoMaterias } = require('./repositorios/materias');
 const { crearRepoMateriales } = require('./repositorios/materiales');
 const { crearRepoValidaciones } = require('./repositorios/validaciones');
 const { crearRepoMisMateriales } = require('./repositorios/misMateriales');
-const { crearRepoFavoritos } = require('./repositorios/favoritos');
-const { crearRepoDetalleMaterial } = require('./repositorios/detalleMaterial');
 const { crearRepoNotificaciones } = require('./repositorios/notificaciones');
+const { crearRepoDetalleMaterial } = require('./repositorios/detalleMaterial');
+const { crearRepoFavoritos } = require('./repositorios/favoritos');
 const { crearRepoDocentes } = require('./repositorios/docentes');
+const { crearRepoCatalogo } = require('./repositorios/catalogo');
 
 async function iniciar() {
   const pool = crearPool(config.db);
@@ -30,10 +31,11 @@ async function iniciar() {
       materiales: crearRepoMateriales(pool),
       validaciones: crearRepoValidaciones(pool),
       misMateriales: crearRepoMisMateriales(pool),
-      favoritos: crearRepoFavoritos(pool),
-      detalleMaterial: crearRepoDetalleMaterial(pool),
       notificaciones: crearRepoNotificaciones(pool),
+      detalleMaterial: crearRepoDetalleMaterial(pool),
+      favoritos: crearRepoFavoritos(pool),
       docentes: crearRepoDocentes(pool),
+      catalogo: crearRepoCatalogo(pool),
     },
     correo: crearServicioCorreo(),
   });
